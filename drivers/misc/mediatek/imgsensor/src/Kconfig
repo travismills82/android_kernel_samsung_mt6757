@@ -1,0 +1,31 @@
+config MTK_IMGSENSOR_SPECIFY_SENSOR
+  bool MTK_IMGSENSOR_SPECIFY_SENSOR
+  depends on MTK_IMGSENSOR
+  help
+    Specify name of each sensor to prevent obtaining wrong sensor driver with same sensor ID.
+    For example, imx258_mipi_raw and imx258_mipi_mono are of same sensor ID. If not specifying
+    sensor, imx258_mipi_mono may be recognized as imx258_mipi_raw.
+
+config MTK_IMGSENSOR_MAIN
+  string "Custom main image sensor"
+  depends on MTK_IMGSENSOR_SPECIFY_SENSOR
+  help
+    Specify main sensor.
+
+config MTK_IMGSENSOR_SUB
+  string "Custom sub image sensor"
+  depends on MTK_IMGSENSOR_SPECIFY_SENSOR
+  help
+    Specify sub sensor.
+
+config MTK_IMGSENSOR_MAIN2
+  string "Custom main2 image sensor"
+  depends on MTK_IMGSENSOR_SPECIFY_SENSOR
+  help
+    Specify main2 sensor.
+
+config MTK_IMGSENSOR_SUB2
+  string "Custom sub2 image sensor"
+  depends on MTK_IMGSENSOR_SPECIFY_SENSOR
+  help
+    Specify sub2 sensor.

@@ -1,0 +1,61 @@
+/* Camera sensor dtsi file */
+
+&i2c2 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	clock-frequency = <400000>;
+	mediatek,use-open-drain;
+	camera_main@1a {
+		compatible = "mediatek,camera_main";
+		reg = <0x1a>;
+		status = "okay";
+	};
+
+	camera_main_af@0c {
+		compatible = "mediatek,camera_main_af";
+		reg = <0x0c>;
+		status = "okay";
+	};
+
+};
+
+&i2c4 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	clock-frequency = <400000>;
+	mediatek,use-open-drain;
+	camera_sub@10 {
+		compatible = "mediatek,camera_sub";
+		reg = <0x10>;
+		status = "okay";
+	};
+
+	camera_sub_af@0c {
+		compatible = "mediatek,camera_sub_af";
+		reg = <0x0c>;
+		status = "okay";
+	};
+
+	camera_main_two_af@0d {
+		compatible = "mediatek,camera_main_two_af";
+		reg = <0x0d>;
+		status = "okay";
+	};
+
+};
+
+/* CAMERA GPIO expander standardization */
+&kd_camera_hw1 {
+	mtkcam_cam_en  =     <&expander_gpios1 0 0>;
+	mtkcam_cam_sel =     <&expander_gpios1 2 0>;
+	mtkcam_main_vddret = <&expander_gpios1 5 0>;
+	mtkcam_main_vddio =  <&expander_gpios1 1 0>;
+	mtkcam_main_rst =    <&expander_gpios1 7 0>;
+	mtkcam_sub_rst =    <&expander_gpios1 10 0>;
+	mtkcam_main2_rst =  <&expander_gpios1 15 0>;
+	mtkcam_main2_vddad = <&expander_gpios1 6 0>;
+	mtkcam_main2_vddaf = <&expander_gpios1 8 0>;
+	status = "okay";
+};
+/* CAMERA GPIO end */
+

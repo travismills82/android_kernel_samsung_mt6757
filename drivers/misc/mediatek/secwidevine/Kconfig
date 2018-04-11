@@ -1,0 +1,5 @@
+config BLOWFISH_TEE_SUPPORT
+	bool "Enable Blowfish TEE Support"
+	default y
+	help
+	  Enable Blowfish TEE Support

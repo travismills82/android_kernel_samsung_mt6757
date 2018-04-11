@@ -1,0 +1,59 @@
+/*
+ * Synaptics DSX touchscreen driver
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * INFORMATION CONTAINED IN THIS DOCUMENT IS PROVIDED "AS-IS," AND SYNAPTICS
+ * EXPRESSLY DISCLAIMS ALL EXPRESS AND IMPLIED WARRANTIES, INCLUDING ANY
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE,
+ * AND ANY WARRANTIES OF NON-INFRINGEMENT OF ANY INTELLECTUAL PROPERTY RIGHTS.
+ * IN NO EVENT SHALL SYNAPTICS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, PUNITIVE, OR CONSEQUENTIAL DAMAGES ARISING OUT OF OR IN CONNECTION
+ * WITH THE USE OF THE INFORMATION CONTAINED IN THIS DOCUMENT, HOWEVER CAUSED
+ * AND BASED ON ANY THEORY OF LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+ * NEGLIGENCE OR OTHER TORTIOUS ACTION, AND EVEN IF SYNAPTICS WAS ADVISED OF
+ * THE POSSIBILITY OF SUCH DAMAGE. IF A TRIBUNAL OF COMPETENT JURISDICTION DOES
+ * NOT PERMIT THE DISCLAIMER OF DIRECT DAMAGES OR ANY OTHER DAMAGES, SYNAPTICS'
+ * TOTAL CUMULATIVE LIABILITY TO ANY PARTY SHALL NOT EXCEED ONE HUNDRED U.S.
+ * DOLLARS.
+ */
+
+&i2c1 {
+	status = "ok";
+	synaptics_dsx@4B {
+		compatible = "synaptics,dsx-i2c";
+		reg = <0x4B>;
+		interrupt-parent = <&eintc>;
+		interrupts = <1 0x2008>;		/*need configure*/
+		//vdd-supply = <&mt_pmic_vldo28_ldo_reg>;	/*need configure*/
+		//avdd-supply = <&mt_pmic_vldo28_ldo_reg>;	/*need configure*/
+		/*pinctrl-names = "pmx_ts_active", "pmx_ts_suspend";	*/
+		/*pinctrl-0 = <&ts_active>;	*/
+		/*pinctrl-1 = <&ts_suspend>;	*/
+		//synaptics,pwr-reg-name = "avdd";	/*need configure*/
+		//synaptics,bus-reg-name = "vdd";	/*need configure*/
+		synaptics,ub-i2c-addr = <0x4B>;
+		synaptics,irq-gpio = <&pio 1 0x2008>; /* need configure,IRQF_ONESHOT | IRQF_TRIGGER_LOW */
+		synaptics,irq-on-state = <0>;
+		synaptics,power-delay-ms = <200>;
+		synaptics,reset-delay-ms = <200>;
+		//synaptics,reset-gpio = <&pio 18 0x2008>;	/*maybe need this property, need configure*/
+		//synaptics,reset-on-state = <0>;
+		//synaptics,reset-active-ms = <20>;
+		/* uncomment and update line below as appropriate if there are 0D buttons */
+		/* synaptics,cap-button-codes = <102 158>; */
+		/* uncomment and update lines below as appropriate if there are virtual buttons */
+		/* synaptics,vir-button-codes = <102 100 900 100 60 158 300 900 100 60>; */
+		/* synaptics,max-y-for-2d = <800>; */
+		synaptics,x-flip = <1>;
+		synaptics,y-flip = <1>;
+	};
+};

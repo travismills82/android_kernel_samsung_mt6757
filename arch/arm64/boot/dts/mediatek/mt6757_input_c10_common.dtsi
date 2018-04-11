@@ -1,0 +1,171 @@
+/* Copyright (c) 2016, The Linux Foundation. All rights reserved.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 and
+ * only version 2 as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+#include <dt-bindings/input/input.h>
+
+/*
+ * Input device common device tree file.
+ */
+
+/* TOUCH start */
+&i2c1 {
+	status = "disabled";
+
+	#address-cells = <1>;
+	#size-cells = <0>;
+	def_speed = <400>;
+
+	mms_ts@48 {
+		status = "disabled";
+		compatible = "melfas,mms_ts";
+		reg = <0x48>;
+		pinctrl-names = "on_state", "off_state";
+		pinctrl-0 = <&tsp_int_active>;
+		pinctrl-1 = <&tsp_int_suspend>;
+		interrupt-parent = <&eintc>;
+		interrupts = <3 IRQ_TYPE_EDGE_FALLING>;
+		melfas,vdd_en = <&pio 76 0>;
+		melfas,irq-gpio = <&pio 3 0>;
+		melfas,max_x = <1080>;
+		melfas,max_y = <1920>;
+		melfas,fw_name = "tsp_melfas/mms438_j7x.fw";
+		melfas,bringup = <0>;
+	};
+
+	touchscreen@48 {
+		status = "disabled";
+		compatible = "sec,sec_ts";
+		reg = <0x48>;
+		pinctrl-names = "on_state", "off_state";
+		pinctrl-0 = <&tsp_int_active>;
+		pinctrl-1 = <&tsp_int_suspend>;
+		/* pressure-sensor = "Y"; */
+		/* sec,tsp-id_gpio = <&pm8005_gpios 1 0>; */
+		interrupt-parent = <&eintc>;
+		interrupts = <3 IRQ_TYPE_EDGE_FALLING>;
+		sec,irq_gpio = <&pio 3 0>;
+		sec,irq_type = <8200>;
+		sec,max_coords = <4095 4095>;   /* x y */
+		sec,mis_cal_check = <1>;
+		sec,vdd_en = <&pio 76 0>;
+		/* sec,regulator_dvdd = "tsp_io"; */
+		/* sec,regulator_avdd = "tsp_avdd"; */
+		/* sec,regulator_boot_on; */
+		sec,always_lpmode = <0>;
+		sec,pat_function = <1>;
+		/* sec,afe_base = <0x0121>; */
+		sec,project_name = "C910", "C910";
+		sec,firmware_name = "tsp_sec/y661_c10.fw";
+		/* support_dex_mode; */
+		sec,bringup = <0>;
+	};
+
+};
+/* TOUCH end */
+
+/* TOUCH KEY start */
+/* default GPIO number
+ * default SDA : 190
+ * default SCL : 191
+ * defualt IRQ : 11
+ */
+&i2c23 {
+	status = "disabled";
+	
+	mc96ft16xx@20{
+		status = "disabled";
+		compatible = "abov,mc96ft16xx";
+		reg = <0x20>;
+		interrupt-parent = <&eintc>;
+		interrupts = <11 IRQ_TYPE_LEVEL_LOW>;
+		pinctrl-names = "touchkey_active", "touchkey_suspend";
+		pinctrl-0 = <&touchkey_i2c_active &touchkey_int_active>;
+		pinctrl-1 = <&touchkey_i2c_suspend>;
+		abov,lvdd-supply = <&mt_pmic_vgp2_ldo_reg>;
+		/*avdd-supply = <&s2mpb02_l16>;*/
+		/*vddo-supply = <&pm8994_s4>;*/
+		abov,sda-gpio = <&pio 190 0>;
+		abov,scl-gpio = <&pio 191 0>;
+		abov,irq-gpio = <&pio 11 0>;
+		abov,gpio-en = <&expander_gpios0 14 0>;
+		/* abov,sub-det = <&pm8994_gpios 5 0x1>; */
+		abov,reg-boot-on; /* enable supply when pmic boot on */
+		abov,fw-name = "abov/abov_tk_C10.fw";
+	};
+
+	a96t3x6@20{
+		status = "disabled";
+		compatible = "abov,a96t3x6";
+		reg = <0x20>;
+		interrupt-parent = <&eintc>;
+		interrupts = <11 IRQ_TYPE_LEVEL_LOW>;
+		pinctrl-names = "touchkey_active", "touchkey_suspend";
+		pinctrl-0 = <&touchkey_i2c_active &touchkey_int_active>;
+		pinctrl-1 = <&touchkey_i2c_suspend>;
+		abov,lvdd-supply = <&mt_pmic_vgp2_ldo_reg>;
+		abov,sda-gpio = <&pio 190 0>;
+		abov,scl-gpio = <&pio 191 0>;
+		abov,irq-gpio = <&pio 11 0>;
+		abov,tkey_en-gpio = <&expander_gpios0 14 0>;
+		abov,firmware_name = "abov/abov_t316_C10.fw";
+		/* vdd_led-supply = <&pm8950_l10>; */
+		/* abov,tkey_led_en-gpio = <&tlmm 42 0>; */
+		/*vddo-supply = <&pm660_l11>;*/
+		abov,firmup_cmd = <0x31>;
+		abov,bringup = <0>;
+	};
+
+ };
+/* TOUCH KEY end */
+
+/* gpio keys start */
+/* default GPIO number
+ * default VUOLUME_UP : 43
+ * default VUOLUME_DN : 42
+ */
+&gpio_keys {
+	status = "disabled";
+	pinctrl-names = "default";
+	pinctrl-0 = <&key_volup &key_home &key_wink>;
+	name = "gpio_keys";
+	
+	button@1 {
+		status = "disabled";
+		label = "gpio-keys: KEY_VOLUMEUP";
+		linux,code = <KEY_VOLUMEUP>;
+		interrupt-parent = <&eintc>;
+		interrupts = <43 IRQ_TYPE_NONE>;
+		debounce-interval = <15>;
+		gpios = <&pio 43 1>;
+	};
+	button@2 {
+		status = "disabled";
+		label = "gpio-keys: KEY_HOME";
+		linux,code = <KEY_HOMEPAGE>;
+		interrupt-parent = <&eintc>;
+		interrupts = <42 IRQ_TYPE_NONE>;
+		debounce-interval = <15>;
+		gpios = <&pio 42 1>;
+		gpio-key,wakeup = <1>;
+	};
+	button@3 {
+		status = "disabled";
+		label = "gpio-keys: KEY_WINK";
+		linux,code = <KEY_WINK>;
+		interrupt-parent = <&eintc>;
+		interrupts = <21 IRQ_TYPE_NONE>;
+		debounce-interval = <15>;
+		gpios = <&pio 21 1>;
+		gpio-key,wakeup = <1>;
+	};
+};
+/* gpio keys end */

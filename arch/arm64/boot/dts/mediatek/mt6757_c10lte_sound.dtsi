@@ -1,0 +1,306 @@
+/*
+* Cirrus-CS47L15 Sound Card Device Tree Source
+*
+* Copyright (c) 2016 Cirrus Logic .
+*		https://www.cirrus.com
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License version 2 as
+* published by the Free Software Foundation.
+*/
+
+&spi3 {
+	/delete-property/ dma-mode;
+	/delete-property/ dmas;
+	/delete-property/ dma-names;
+
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "okay";
+
+	audio_codec: cs47l15@0 {
+		spi-max-frequency = <25000000>;
+		compatible = "cirrus,cs47l15";
+		reg = <0x00>;
+
+		interrupt-controller;
+		interrupt-parent = <&eintc>;
+		interrupts = <84 IRQ_TYPE_LEVEL_LOW>;
+		debounce = <84 100>;
+
+		gpio-controller;
+		#gpio-cells = <2>;
+		#sound-dai-cells = <1>;
+
+		ldo-1p8-en-gpios = <&expander_gpios0 0 0>;
+		ldo-1p2-en-gpios = <&expander_gpios0 1 0>;
+		test-rst-gpios = <&expander_gpios0 5 0>;
+
+		AVDD-supply = <&mt_pmic_va18_ldo_reg>;
+		DCVDD-supply = <&mt_pmic_va18_ldo_reg>;
+		DBVDD1-supply = <&mt_pmic_va18_ldo_reg>;
+		CPVDD1-supply = <&mt_pmic_va18_ldo_reg>;
+		CPVDD2-supply = <&mt_pmic_va18_ldo_reg>;
+		SPKVDD-supply = <&mt_pmic_va18_ldo_reg>;
+		MICVDD-supply = <&mt_pmic_va18_ldo_reg>;
+
+		cirrus,micbias1 = <1800 0 1 1 1 1 1 0>;
+		cirrus,dmic-ref = <1 1>;
+		cirrus,inmode = <
+			2 2 0 0	/* IN1 */
+			2 2 0 0	/* IN2 */
+		>;
+
+		cirrus,gpio-defaults = <
+			0x00002000 0x00006000 /* AIF1TXDAT (GPIO1) */
+			0x00002000 0x00006000 /* AIF1RXDAT (GPIO2) */
+			0x00002000 0x00006000 /* AIF1BCLK (GPIO3) */
+			0x00002000 0x00006000 /* AIF1LRCLK (GPIO4) */
+			0x00002000 0x00006000 /* AIF2TXDAT (GPIO5) */
+			0x00002000 0x00006000 /* AIF2RXDAT (GPIO6) */
+			0x00002000 0x00006000 /* AIF2BCLK (GPIO7) */
+			0x00002000 0x00006000 /* AIF2LRCLK (GPIO8) */
+			0x00002000 0x00006000 /* AIF3TXDAT (GPIO9) */
+			0x00002000 0x00006000 /* AIF3RXDAT (GPIO10) */
+			0x00002000 0x00006000 /* AIF3BCLK (GPIO11) */
+			0x00002000 0x00006000 /* AIF3LRCLK (GPIO12) */
+			0x0000A801 0x00004800 /* SPKTXDAT (GPIO13) - RESET */
+			0x00002040 0x00001000 /* SPKCLK (GPIO14)  - OPCLK */
+			0x00002001 0x0000c000 /* SPKRXDAT (GPIO15) - Dummy RESET */
+		>;
+
+		cirrus,gpsw = <3>;
+
+		cirrus,accdet {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			acc@1 {
+				reg = <1>;
+
+				cirrus,micd-bias-start-time = <1>;
+				cirrus,micd-rate = <7>;
+				cirrus,micd-dbtime=<0x1>;
+				cirrus,micd-timeout-ms = <1000>;
+				cirrus,micd-force-micbias;
+
+				cirrus,hpdet-short-circuit-imp = <3>;
+				cirrus,jd-wake-time = <5000>;
+				cirrus,micd-open-circuit-declare = <1>;
+				cirrus,micd-detect-debounce-ms = <300>;
+				cirrus,hs-mic = <1>;
+				cirrus,micd-configs = <1 0 0 0 0>;
+				cirrus,micd-ranges = <
+					116 226
+					173 582
+					321 115
+					752 114
+					1257 217
+				>;
+
+				cirrus,micd-clamp-mode = <0x8>;
+				cirrus,jd-use-jd2;
+				cirrus,micd-software-compare;
+
+				cirrus,moisture-imp = <2000>;
+				cirrus,moisture-debounce = <40>;
+
+				cirrus,init-delay-ms = <30>;
+			};
+		};
+
+		adsps {
+			#address-cells = <1>;
+			#size-cells = <0>;
+			adsp@0FFE00 {
+				reg = <0x0FFE00>;
+				firmware {
+					SPK_PROTECT {
+						cirrus,full-name;
+						cirrus,wmfw-file = "cs47l15-dsp1-spk-protect.wmfw";
+						cirrus,bin-file = "cs47l15-dsp1-spk-protect.bin";
+					};
+					KARAOKE {
+						cirrus,full-name;
+						cirrus,wmfw-file = "cs47l15-dsp1-karaoke-vocals.wmfw";
+						cirrus,bin-file = "cs47l15-dsp1-karaoke-vocals.bin";
+					};
+				};
+			};
+		};
+	}; /* audio_codec */
+};
+
+&i2c0 {
+	cs35l35@40 {
+		#sound-dai-cells = <1>;
+		compatible = "cirrus,cs35l35";
+		reg = <0x40>;
+
+		interrupt-parent = <&eintc>;
+		interrupts = <77 0>;
+		debounce = <77 100>;
+
+		reset-gpios = <&audio_codec 12 0>;
+
+		VA-supply = <&mt_pmic_va18_ldo_reg>;
+		VP-supply = <&mt_pmic_va18_ldo_reg>;
+
+		cirrus,stereo-config;
+		cirrus,shared-boost;
+		cirrus,audio-channel = <0x0>;
+		cirrus,advisory-channel = <0x1>;
+		cirrus,boost-ctl-millivolt = <9000>;
+		cirrus,boost-peak-milliamp = <4430>;
+		cirrus,sp-drv-strength = <0x1>;
+		cirrus,sp-drv-unused = <0x0>;
+
+		cirrus,classh-internal-algo {
+			cirrus,classh-release-rate = <0x03>;
+			cirrus,classh-headroom = <0x8>;
+		};
+
+		cirrus,monitor-signal-format {
+			cirrus,imon = /bits/ 8 <0x03 0x04 0x00 0x06>;
+			cirrus,vmon = /bits/ 8 <0x03 0x00 0x00>;
+			cirrus,vpmon = /bits/ 8 <0x00 0x00 0x00>;
+			cirrus,vbstmon = /bits/ 8 <0x00 0x00 0x00>;
+			cirrus,vpbrstat = /bits/ 8 <0x00 0x00 0x00>;
+			cirrus,zerofill = /bits/ 8 <0x00 0x00 0x00>;
+		};
+	};
+
+	cs35l35@41 {
+		#sound-dai-cells = <1>;
+		compatible = "cirrus,cs35l35";
+		reg = <0x41>;
+
+		interrupt-parent = <&eintc>;
+		interrupts = <77 0>;
+		debounce = <77 100>;
+
+		reset-gpios = <&audio_codec 12 0>;
+
+		VA-supply = <&mt_pmic_va18_ldo_reg>;
+		VP-supply = <&mt_pmic_va18_ldo_reg>;
+
+		cirrus,stereo-config;
+		cirrus,shared-boost;
+		cirrus,external-boost;
+		cirrus,audio-channel = <0x1>;
+		cirrus,sp-drv-strength = <0x1>;
+		cirrus,sp-drv-unused = <0x0>;
+
+		cirrus,classh-internal-algo {
+			cirrus,classh-release-rate = <0x03>;
+			cirrus,classh-headroom = <0x8>;
+		};
+
+		cirrus,monitor-signal-format {
+			cirrus,imon = /bits/ 8 <0x03 0x04 0x01 0x08>;
+			cirrus,vmon = /bits/ 8 <0x03 0x00 0x01>;
+			cirrus,vpmon = /bits/ 8 <0x00 0x00 0x00>;
+			cirrus,vbstmon = /bits/ 8 <0x00 0x00 0x00>;
+			cirrus,vpbrstat = /bits/ 8 <0x00 0x00 0x00>;
+			cirrus,zerofill = /bits/ 8 <0x00 0x00 0x00>;
+		};
+	};
+};
+
+&spi5 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "okay";
+
+	dbmd4_spi:dbmd4_interface@0  {
+		compatible = "dspg,dbmd4-spi";
+		spi-max-frequency = <4800000>;
+		reg = <0x0>;
+
+		read-chunk-size  = <0x2000>;    /* 8192 bytes   */
+		write-chunk-size = <0x40000>;   /* 262,144 bytes */
+		dma_min_buffer_size = <0>;
+	};
+};
+
+/ {
+	audio@11220000 {
+		/* name,id,source,rate,valid */
+		cirrus,sysclk = <1 4 98304000>;
+		/* cirrus,asyncclk = <2 5 90316800>; */
+		cirrus,opclk = <3 0 12288000>;
+		cirrus,dspclk = <8 4 147456000>;
+		cirrus,fll1-refclk = <1 0 24576000>;
+		/* cirrus,fll2-refclk = <2 1 32768>; */
+
+		mediatek,audio-routing =
+			"IN1AL", "DMIC1",
+			"IN1AR", "DMIC2",
+			"DMIC1", "MICBIAS1C",
+			"DMIC2", "MICBIAS1C",
+			"HEADSETMIC", "MICBIAS1A",
+			"IN1BL", "HEADSETMIC",
+			"HEADPHONE", "HPOUTL",
+			"HEADPHONE", "HPOUTR",
+			"AIF2 Playback", "OPCLK",
+			"AIF2 Capture", "OPCLK",
+			"ALWAYS OUTPUT", "ALWAYS MIC",
+			"ALWAYS MIC", "MICBIAS1C",
+			"SPK", "Left SPK",
+			"RCV", "Right SPK";
+	};
+
+	dbmdx {
+		status = "okay";
+		compatible = "dspg,dbmdx-codec";
+		sv-gpio = <&pio 13 0>; /* VOICE_INT */
+		wakeup-gpio = <&expander_gpios0 9 0>; /* VOICE_WAKE */
+		reset-gpio = <&expander_gpios0 8 0>; /* VOICE_RST */
+		auto_buffering = <1>;
+		multi-interface-support = <1>;
+		cd-interfaces = <&dbmd4_spi>;
+		va-interfaces = <0 0 0 0>;
+		feature-va; /* enable VA */
+		va-firmware-name = "dbmd4_va_fw.bin";
+		va-config = <0x80000000
+			     0x80000000
+			     0x80000000
+			     0x80290020
+			     0x802210E0
+			     0x80158E8E
+			     0x801b0020
+			     0x80230001
+			     0x8010401a
+			     0x80000000
+			     0x80000000
+			     0x80000000>;
+		va-speeds = <0x0000 460800 0 960000
+			     0x0000 2000000 0 960000
+			     0x0000 3000000 0 4800000>;
+		va-mic-config = <0xf041 0xf053 0x0008>;
+		va-mic-mode = <0>;
+		master-clk-rate = <32768>;
+		/* constant-clk-rate = <32768>; */
+		firmware_id = <0xdbd4>;
+		use_gpio_for_wakeup = <1>; /* Use wakeup gpio */
+		wakeup_set_value = <0>;  /* Value to write to wakeup gpio */
+		auto_detection = <1>;
+		detection_buffer_channels = <0>;
+		min_samples_chunk_size = <128>;
+		pcm_streaming_mode = <1>;
+		boot_options = <0x200>; /* Verify chip id */
+		send_uevent_on_detection = <1>;
+		send_uevent_after_buffering = <0>;
+		detection_after_buffering = <0>;
+		va_backlog_length = <2>;
+		amodel_options = <0x1>;
+	};
+
+	dbmdx-snd-soc-platform {
+		compatible = "dspg,dbmdx-snd-soc-platform";
+	};
+
+	snd-dbmdx-mach-drv {
+		compatible = "dspg,snd-dbmdx-mach-drv";
+	};
+};
